@@ -1,5 +1,4 @@
 require 'twitter'
-require 'byebug'
 require 'json'
 
 client = Twitter::REST::Client.new do |config|
@@ -9,10 +8,9 @@ client = Twitter::REST::Client.new do |config|
   config.access_token_secret = ENV['ACCESS_TOKEN_SECRET']
 end
 
-last_tweets = client.user_timeline('celsodantas')
-last_tweet  = client.user('phoet_engrish').status
+last_tweets = client.user_timeline('phoet')
+last_tweet  = client.user('idontgiveaphoet').status
 
-# temp_last = Time.parse('2015-02-02 00:51:10 +0000')
 last_tweets.select! {|twit| twit.created_at > last_tweet.created_at }.reverse!
 last_tweets.each do |tweet|
   clear_tweet = tweet.text.gsub(/@/, '❤️')
