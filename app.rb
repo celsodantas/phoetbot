@@ -1,5 +1,6 @@
 require 'twitter'
 require 'json'
+require 'open3'
 
 client = Twitter::REST::Client.new do |config|
   config.consumer_key        = ENV['CONSUMER_KEY']
@@ -16,11 +17,13 @@ last_tweets.each do |tweet|
   clear_tweet = tweet.text.gsub(/@/, '❤️')
   escaped_tweet = URI.escape(clear_tweet)
 
-  from = "de"
-  to   = "en"
+  from  = "de"
+  to    = "en"
+  url   = "http://translate.google.com/translate_a/t?client=json&text=#{escaped_tweet}&sl=#{from}&tl=#{to}&multires=1&ssel=0&tsel=0&sc=1"
+  agent = "Mozilla/5.0"
 
-  json = `curl -s -A "Mozilla/5.0" "http://translate.google.com/translate_a/t?client=json&text=#{escaped_tweet}&sl=#{from}&tl=#{to}&multires=1&ssel=0&tsel=0&sc=1"`
-  trans = JSON.parse(json)['sentences'][0]['trans']
+  json, _ = Open3.capture2('curl', '-s', '-A', agent, url)
+  trans   = JSON.parse(json)['sentences'].map { |sentence| sentence['trans'] }.join(' ')
   puts "from: #{clear_tweet} to: #{trans}"
 
   client.update(trans)
