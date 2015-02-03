@@ -13,8 +13,7 @@ last_tweets = client.user_timeline('celsodantas')
 last_tweet  = client.user('phoet_engrish').status
 
 # temp_last = Time.parse('2015-02-02 00:51:10 +0000')
-last_tweets.select {|twit| twit.created_at > last_tweet.created_at }
-
+last_tweets.select! {|twit| twit.created_at > last_tweet.created_at }.reverse!
 last_tweets.each do |tweet|
   clear_tweet = tweet.text.gsub(/@/, '❤️')
   escaped_tweet = URI.escape(clear_tweet)
