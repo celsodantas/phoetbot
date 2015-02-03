@@ -1,5 +1,6 @@
 require 'twitter'
 require 'json'
+require 'google_translate'
 
 client = Twitter::REST::Client.new do |config|
   config.consumer_key        = ENV['CONSUMER_KEY']
@@ -13,15 +14,14 @@ last_tweet  = client.user('idontgiveaphoet').status
 
 last_tweets.select! {|twit| twit.created_at > last_tweet.created_at }.reverse!
 last_tweets.each do |tweet|
-  clear_tweet = tweet.text.gsub(/@/, '❤️')
-  escaped_tweet = URI.escape(clear_tweet)
+  unescaped_tweet = CGI.unescapeHTML(tweet.text)
+  tweet_with_love = unescaped_tweet.gsub(/@/, '❤️')
 
   from = "de"
   to   = "en"
 
-  json = `curl -s -A "Mozilla/5.0" "http://translate.google.com/translate_a/t?client=json&text=#{escaped_tweet}&sl=#{from}&tl=#{to}&multires=1&ssel=0&tsel=0&sc=1"`
-  trans = JSON.parse(json)['sentences'][0]['trans']
-  puts "from: #{clear_tweet} to: #{trans}"
+  translation = GoogleTranslate.new.translate(from, to, tweet_with_love)[0][0][0]
+  puts "from: #{tweet_with_love} to: #{translation}"
 
-  client.update(trans)
+  client.update(translation)
 end
