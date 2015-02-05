@@ -23,5 +23,5 @@ last_tweets.each do |tweet|
   translation = GoogleTranslate.new.translate(from, to, tweet_with_love)[0][0][0]
   puts "from: #{tweet_with_love} to: #{translation}"
 
-  client.update(translation)
+  client.update(translation[0...140], in_reply_to_status_id: tweet.id)
 end
