@@ -12,7 +12,7 @@ end
 last_tweets = client.user_timeline('phoet')
 last_tweet  = client.user('idontgiveaphoet').status
 
-last_tweets.select! {|twit| twit.created_at > last_tweet.created_at }.reverse!
+last_tweets = last_tweets.select {|twit| twit.created_at > last_tweet.created_at }.reverse
 last_tweets.each do |tweet|
   unescaped_tweet = CGI.unescapeHTML(tweet.text)
   tweet_with_love = unescaped_tweet.gsub(/@/, '❤️')
